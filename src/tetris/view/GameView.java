@@ -25,33 +25,33 @@ public class GameView {
         gameArea.setMinSize(gameAreaWidth, gameAreaHeight);
         gameArea.setMaxSize(gameAreaWidth, gameAreaHeight);
 
-        double rowHeight = Math.floor(gameAreaHeight * 0.85); // Keep 15% vertical margin for breathing room.
-        double rowWidth = Math.floor(rowHeight * 8 / 7);
-        rowWidth = Math.min(rowWidth, Math.floor(gameAreaWidth * 0.95)); // Cap width to preserve side padding.
-        if (rowWidth < Math.floor(rowHeight * 8 / 7)) {
-            rowHeight = Math.floor(rowWidth * 7 / 8);
-        }
+        double rowHeight = Math.floor(gameAreaHeight * 0.85); // 85% height keeps vertical margins as specified.
+        double nextWidth = Math.floor(rowHeight / 7);
+        double rowWidth = rowHeight + nextWidth;
 
-        double playFieldSize = rowHeight;
-        double nextWidth = Math.floor(rowWidth / 8);
-
-        this.playFieldPane = new DeviceFramePane(playFieldSize);
+        this.playFieldPane = new DeviceFramePane(rowHeight);
         this.nextPane = new NextPane(nextWidth, rowHeight);
         this.characterPane = new CharacterPane();
         this.hudPane = new HudPane();
 
         HBox row = new HBox(playFieldPane, nextPane);
         row.setAlignment(Pos.TOP_LEFT);
-        row.setPrefSize(playFieldSize + nextWidth, rowHeight);
+        row.setPrefSize(rowWidth, rowHeight);
 
         StackPane.setAlignment(row, Pos.CENTER);
         gameArea.getChildren().add(row);
 
         VBox sideArea = new VBox(characterPane, hudPane);
-        sideArea.setPrefSize(720, 1080);
-        sideArea.setMinSize(720, 1080);
-        sideArea.setMaxSize(720, 1080);
+        sideArea.setPrefSize(480, 1080);
+        sideArea.setMinSize(480, 1080);
+        sideArea.setMaxSize(480, 1080);
 
+        StackPane leftSpacer = new StackPane();
+        leftSpacer.setPrefSize(240, 1080);
+        leftSpacer.setMinSize(240, 1080);
+        leftSpacer.setMaxSize(240, 1080);
+
+        root.setLeft(leftSpacer);
         root.setCenter(gameArea);
         root.setRight(sideArea);
         root.setStyle("-fx-background-color: black;");

@@ -12,9 +12,9 @@ public class HudPane extends VBox {
     private final Label dialogueLabel;
 
     public HudPane() {
-        setPrefSize(720, 280);
-        setMinSize(720, 280);
-        setMaxSize(720, 280);
+        setPrefSize(480, 280);
+        setMinSize(480, 280);
+        setMaxSize(480, 280);
         setAlignment(Pos.TOP_LEFT);
         setSpacing(20);
         setPadding(new Insets(20, 30, 20, 30));
@@ -28,7 +28,7 @@ public class HudPane extends VBox {
         linesLabel.setStyle("-fx-font-size: 22px; -fx-text-fill: white;");
         dialogueLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #f0f0f0;");
         dialogueLabel.setWrapText(true);
-        dialogueLabel.setMaxWidth(660);
+        dialogueLabel.setMaxWidth(420);
 
         getChildren().addAll(scoreLabel, linesLabel, dialogueLabel);
     }

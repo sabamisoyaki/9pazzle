@@ -19,7 +19,9 @@ public class DeviceFramePane extends Pane {
         frame.setStroke(Color.web("#444"));
         frame.setStrokeWidth(4);
 
-        playfieldCanvas = new Canvas(frameSize, frameSize);
+        playfieldCanvas = new Canvas();
+        playfieldCanvas.setWidth(frameSize);
+        playfieldCanvas.setHeight(frameSize);
         playfieldCanvas.setLayoutX(0);
         playfieldCanvas.setLayoutY(0);
 
