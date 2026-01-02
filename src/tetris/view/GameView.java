@@ -18,40 +18,33 @@ public class GameView {
     public GameView() {
         this.root = new BorderPane();
         this.gameArea = new StackPane();
-        double gameAreaWidth = 1200;
+        double gameAreaWidth = 1440;
         double gameAreaHeight = 1080;
 
         gameArea.setPrefSize(gameAreaWidth, gameAreaHeight);
         gameArea.setMinSize(gameAreaWidth, gameAreaHeight);
         gameArea.setMaxSize(gameAreaWidth, gameAreaHeight);
 
-        double rowHeight = Math.floor(gameAreaHeight * 0.85); // 85% height keeps vertical margins as specified.
-        double nextWidth = Math.floor(rowHeight / 7);
-        double rowWidth = rowHeight + nextWidth;
+        double playFieldSize = 900; // Wireframe square playfield size.
+        double nextHeight = 180; // Wireframe 7:1 vertical split (900:180).
 
-        this.playFieldPane = new DeviceFramePane(rowHeight);
-        this.nextPane = new NextPane(nextWidth, rowHeight);
+        this.playFieldPane = new DeviceFramePane(playFieldSize);
+        this.nextPane = new NextPane(playFieldSize, nextHeight);
         this.characterPane = new CharacterPane();
         this.hudPane = new HudPane();
 
-        HBox row = new HBox(playFieldPane, nextPane);
-        row.setAlignment(Pos.TOP_LEFT);
-        row.setPrefSize(rowWidth, rowHeight);
+        VBox leftColumn = new VBox(playFieldPane, nextPane);
+        leftColumn.setAlignment(Pos.TOP_CENTER);
+        leftColumn.setPrefSize(playFieldSize, playFieldSize + nextHeight);
 
-        StackPane.setAlignment(row, Pos.CENTER);
-        gameArea.getChildren().add(row);
+        StackPane.setAlignment(leftColumn, Pos.CENTER);
+        gameArea.getChildren().add(leftColumn);
 
         VBox sideArea = new VBox(characterPane, hudPane);
         sideArea.setPrefSize(480, 1080);
         sideArea.setMinSize(480, 1080);
         sideArea.setMaxSize(480, 1080);
 
-        StackPane leftSpacer = new StackPane();
-        leftSpacer.setPrefSize(240, 1080);
-        leftSpacer.setMinSize(240, 1080);
-        leftSpacer.setMaxSize(240, 1080);
-
-        root.setLeft(leftSpacer);
         root.setCenter(gameArea);
         root.setRight(sideArea);
         root.setStyle("-fx-background-color: black;");
