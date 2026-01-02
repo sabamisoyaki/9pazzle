@@ -7,21 +7,19 @@ import javafx.scene.shape.Rectangle;
 
 public class DeviceFramePane extends Pane {
 
-    private static final double FRAME_SIZE = 900;
-
     private final Canvas playfieldCanvas;
 
-    public DeviceFramePane() {
-        setPrefSize(FRAME_SIZE, FRAME_SIZE);
-        setMinSize(FRAME_SIZE, FRAME_SIZE);
-        setMaxSize(FRAME_SIZE, FRAME_SIZE);
+    public DeviceFramePane(double frameSize) {
+        setPrefSize(frameSize, frameSize);
+        setMinSize(frameSize, frameSize);
+        setMaxSize(frameSize, frameSize);
 
-        Rectangle frame = new Rectangle(FRAME_SIZE, FRAME_SIZE);
+        Rectangle frame = new Rectangle(frameSize, frameSize);
         frame.setFill(Color.web("#111"));
         frame.setStroke(Color.web("#444"));
         frame.setStrokeWidth(4);
 
-        playfieldCanvas = new Canvas(FRAME_SIZE, FRAME_SIZE);
+        playfieldCanvas = new Canvas(frameSize, frameSize);
         playfieldCanvas.setLayoutX(0);
         playfieldCanvas.setLayoutY(0);
 

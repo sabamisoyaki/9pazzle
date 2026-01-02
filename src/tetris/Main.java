@@ -23,7 +23,6 @@ public class Main extends Application {
     private Stage primaryStage;
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
-    private static final int PLAYFIELD_SIZE = 900;
 
     @Override
     public void start(Stage stage) {
@@ -69,13 +68,12 @@ public class Main extends Application {
     // =====================================================
     private Scene makeGameScene() {
 
+        GameView view = new GameView();
         GameController controller = new GameController();
         int cellSize = Math.min(
-                PLAYFIELD_SIZE / Board.COLS,
-                PLAYFIELD_SIZE / Board.ROWS);
+                (int) (view.getPlayFieldPane().getPlayfieldCanvas().getWidth() / Board.COLS),
+                (int) (view.getPlayFieldPane().getPlayfieldCanvas().getHeight() / Board.ROWS));
         Render renderer = new Render(cellSize);
-
-        GameView view = new GameView();
         NextPane nextPane = view.getNextPane();
         HudPane hudPane = view.getHudPane();
 
