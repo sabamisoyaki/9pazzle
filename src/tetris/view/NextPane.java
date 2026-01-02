@@ -12,9 +12,9 @@ public class NextPane extends VBox {
     private final int nextCellSize;
 
     public NextPane() {
-        setPrefSize(240, 1080);
-        setMinSize(240, 1080);
-        setMaxSize(240, 1080);
+        setPrefSize(300, 900);
+        setMinSize(300, 900);
+        setMaxSize(300, 900);
         setAlignment(Pos.TOP_CENTER);
         setSpacing(24);
         setPadding(new Insets(40, 20, 20, 20));
@@ -23,7 +23,7 @@ public class NextPane extends VBox {
         Label label = new Label("NEXT");
         label.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
 
-        nextCanvas = new Canvas(200, 300);
+        nextCanvas = new Canvas(240, 240);
         nextCellSize = (int) Math.min(nextCanvas.getWidth() / 4, nextCanvas.getHeight() / 4);
 
         getChildren().addAll(label, nextCanvas);

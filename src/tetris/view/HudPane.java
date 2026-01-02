@@ -12,12 +12,12 @@ public class HudPane extends VBox {
     private final Label dialogueLabel;
 
     public HudPane() {
-        setPrefSize(480, 1080);
-        setMinSize(480, 1080);
-        setMaxSize(480, 1080);
+        setPrefSize(720, 280);
+        setMinSize(720, 280);
+        setMaxSize(720, 280);
         setAlignment(Pos.TOP_LEFT);
         setSpacing(20);
-        setPadding(new Insets(40, 30, 30, 30));
+        setPadding(new Insets(20, 30, 20, 30));
         setStyle("-fx-background-color: #181818;");
 
         scoreLabel = new Label("Score: 0");
@@ -28,7 +28,7 @@ public class HudPane extends VBox {
         linesLabel.setStyle("-fx-font-size: 22px; -fx-text-fill: white;");
         dialogueLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: #f0f0f0;");
         dialogueLabel.setWrapText(true);
-        dialogueLabel.setMaxWidth(420);
+        dialogueLabel.setMaxWidth(660);
 
         getChildren().addAll(scoreLabel, linesLabel, dialogueLabel);
     }
@@ -41,15 +41,14 @@ public class HudPane extends VBox {
         linesLabel.setText("Lines: " + lines);
     }
 
-    public void updateDialogue(int score, int rotateRemain, int remainScore) {
+    public void updateDialogue(int score, int lines) {
         String text = String.format(
                 "現在の点数は %d 点。まだ足りないわね。\n"
-                        + "あと %d ライン消すと、ぐるっと回るわ。\n"
+                        + "累計ラインは %d。次はどうする？\n"
                         + "次のミノはこれよ。下にも表示してるけど。\n"
-                        + "あと %d 点で脱ぐわ。頑張って。",
+                        + "焦らず積んでいきましょ。",
                 score,
-                rotateRemain,
-                remainScore);
+                lines);
         dialogueLabel.setText(text);
     }
 }

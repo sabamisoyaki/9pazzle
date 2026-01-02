@@ -8,8 +8,6 @@ import javafx.scene.shape.Rectangle;
 public class DeviceFramePane extends Pane {
 
     private static final double FRAME_SIZE = 900;
-    private static final double PLAYFIELD_SIZE = 720;
-    private static final double PLAYFIELD_OFFSET = (FRAME_SIZE - PLAYFIELD_SIZE) / 2;
 
     private final Canvas playfieldCanvas;
 
@@ -23,9 +21,9 @@ public class DeviceFramePane extends Pane {
         frame.setStroke(Color.web("#444"));
         frame.setStrokeWidth(4);
 
-        playfieldCanvas = new Canvas(PLAYFIELD_SIZE, PLAYFIELD_SIZE);
-        playfieldCanvas.setLayoutX(PLAYFIELD_OFFSET);
-        playfieldCanvas.setLayoutY(PLAYFIELD_OFFSET);
+        playfieldCanvas = new Canvas(FRAME_SIZE, FRAME_SIZE);
+        playfieldCanvas.setLayoutX(0);
+        playfieldCanvas.setLayoutY(0);
 
         getChildren().addAll(frame, playfieldCanvas);
     }

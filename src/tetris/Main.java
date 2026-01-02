@@ -13,20 +13,17 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.controller.GameController;
 import tetris.model.Board;
-import tetris.view.Render;
 import tetris.view.GameView;
 import tetris.view.HudPane;
 import tetris.view.NextPane;
-import tetris.view.WorldView;
+import tetris.view.Render;
 
 public class Main extends Application {
 
     private Stage primaryStage;
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
-    private static final int PLAYFIELD_SIZE = 720;
-    private static final int ROTATE_INTERVAL = 3;
-    private static final int TARGET_SCORE = 1000;
+    private static final int PLAYFIELD_SIZE = 900;
 
     @Override
     public void start(Stage stage) {
@@ -79,7 +76,6 @@ public class Main extends Application {
         Render renderer = new Render(cellSize);
 
         GameView view = new GameView();
-        WorldView worldView = view.getWorldView();
         NextPane nextPane = view.getNextPane();
         HudPane hudPane = view.getHudPane();
 
@@ -92,7 +88,7 @@ public class Main extends Application {
 
         // 初回描画
         renderer.drawAll(
-                worldView.getDeviceFramePane().getPlayfieldCanvas().getGraphicsContext2D(),
+                view.getPlayFieldPane().getPlayfieldCanvas().getGraphicsContext2D(),
                 controller.getBoard(),
                 controller.getCurrent(),
                 controller.getGhost());
@@ -106,9 +102,6 @@ public class Main extends Application {
 
             private long lastFall = 0;
             private final long FALL_SPEED = 300_000_000L;
-            private int previousLines = 0;
-            private double worldAngle = 0;
-
             @Override
             public void handle(long now) {
 
@@ -127,7 +120,7 @@ public class Main extends Application {
                 }
 
                 renderer.drawAll(
-                        worldView.getDeviceFramePane().getPlayfieldCanvas().getGraphicsContext2D(),
+                        view.getPlayFieldPane().getPlayfieldCanvas().getGraphicsContext2D(),
                         controller.getBoard(),
                         controller.getCurrent(),
                         controller.getGhost());
@@ -137,23 +130,13 @@ public class Main extends Application {
                 hudPane.updateScore(score);
                 hudPane.updateLines(lines);
 
-                if (lines != previousLines && lines % ROTATE_INTERVAL == 0) {
-                    worldAngle = (worldAngle + 90) % 360;
-                    worldView.getWorldFrame().setRotate(worldAngle);
-                    previousLines = lines;
-                } else if (lines != previousLines) {
-                    previousLines = lines;
-                }
-
                 renderer.drawNext(
                         nextPane.getNextCanvas().getGraphicsContext2D(),
                         controller.getNext(),
                         nextPane.getNextCellSize(),
                         nextPane.getNextCellSize());
 
-                int rotateRemain = ROTATE_INTERVAL - (lines % ROTATE_INTERVAL);
-                int remainScore = Math.max(0, TARGET_SCORE - score);
-                hudPane.updateDialogue(score, rotateRemain, remainScore);
+                hudPane.updateDialogue(score, lines);
             }
         };
 
