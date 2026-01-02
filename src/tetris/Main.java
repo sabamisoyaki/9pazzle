@@ -5,29 +5,34 @@ import java.util.Set;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tetris.controller.GameController;
 import tetris.model.Board;
 import tetris.view.Render;
+import tetris.view.GameView;
+import tetris.view.HudPane;
+import tetris.view.NextPane;
+import tetris.view.WorldView;
 
 public class Main extends Application {
 
     private Stage primaryStage;
-    private static final int CELL_SIZE = 25;
+    private static final int WINDOW_WIDTH = 1920;
+    private static final int WINDOW_HEIGHT = 1080;
+    private static final int PLAYFIELD_SIZE = 720;
+    private static final int ROTATE_INTERVAL = 3;
+    private static final int TARGET_SCORE = 1000;
 
     @Override
     public void start(Stage stage) {
         this.primaryStage = stage;
         stage.setTitle("TETRIS");
+        stage.setResizable(false);
         showStartScene();
         stage.show();
     }
@@ -47,7 +52,7 @@ public class Main extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: black;");
 
-        Scene scene = new Scene(root, 450, 600);
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.SPACE) {
@@ -68,39 +73,17 @@ public class Main extends Application {
     private Scene makeGameScene() {
 
         GameController controller = new GameController();
-        Render renderer = new Render(CELL_SIZE);
+        int cellSize = Math.min(
+                PLAYFIELD_SIZE / Board.COLS,
+                PLAYFIELD_SIZE / Board.ROWS);
+        Render renderer = new Render(cellSize);
 
-        Canvas gameCanvas = new Canvas(
-                Board.COLS * CELL_SIZE,
-                Board.ROWS * CELL_SIZE);
-        GraphicsContext gc = gameCanvas.getGraphicsContext2D();
+        GameView view = new GameView();
+        WorldView worldView = view.getWorldView();
+        NextPane nextPane = view.getNextPane();
+        HudPane hudPane = view.getHudPane();
 
-        // UI（右側）
-        Label scoreLabel = new Label("Score: 0");
-        Label lineLabel = new Label("Lines: 0");
-        Label nextLabel = new Label("Next:");
-
-        scoreLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
-        lineLabel.setStyle("-fx-font-size: 18px; -fx-text-fill: white;");
-        nextLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;");
-        Canvas nextCanvas = new Canvas(6 * CELL_SIZE, 6 * CELL_SIZE);
-        GraphicsContext ngc = nextCanvas.getGraphicsContext2D();
-
-        VBox uiBox = new VBox(16, scoreLabel, lineLabel, nextLabel, nextCanvas);
-        uiBox.setPadding(new Insets(10));
-        uiBox.setStyle("""
-            -fx-background-color: #222;
-            -fx-padding: 15;
-            -fx-spacing: 10;
-
-            -fx-font-family: 'Consolas', 'Meiryo', sans-serif;
-            -fx-text-fill: white;
-        """);
-        uiBox.setMinWidth(140);
-
-        HBox root = new HBox(gameCanvas, uiBox);
-        root.setStyle("-fx-background-color: black;");
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(view.getRoot(), WINDOW_WIDTH, WINDOW_HEIGHT);
 
         // キー入力管理
         Set<KeyCode> keys = new HashSet<>();
@@ -108,13 +91,23 @@ public class Main extends Application {
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
         // 初回描画
-        renderer.drawAll(gc, controller.getBoard(), controller.getCurrent(), controller.getGhost());
-        renderer.drawNext(ngc, controller.getNext(), CELL_SIZE, CELL_SIZE);
+        renderer.drawAll(
+                worldView.getDeviceFramePane().getPlayfieldCanvas().getGraphicsContext2D(),
+                controller.getBoard(),
+                controller.getCurrent(),
+                controller.getGhost());
+        renderer.drawNext(
+                nextPane.getNextCanvas().getGraphicsContext2D(),
+                controller.getNext(),
+                nextPane.getNextCellSize(),
+                nextPane.getNextCellSize());
 
         AnimationTimer timer = new AnimationTimer() {
 
             private long lastFall = 0;
             private final long FALL_SPEED = 300_000_000L;
+            private int previousLines = 0;
+            private double worldAngle = 0;
 
             @Override
             public void handle(long now) {
@@ -133,15 +126,34 @@ public class Main extends Application {
                     lastFall = now;
                 }
 
-                renderer.drawAll(gc,
+                renderer.drawAll(
+                        worldView.getDeviceFramePane().getPlayfieldCanvas().getGraphicsContext2D(),
                         controller.getBoard(),
                         controller.getCurrent(),
                         controller.getGhost());
 
-                scoreLabel.setText("Score: " + controller.getScore());
-                lineLabel.setText("Lines: " + controller.getLineCount());
+                int score = controller.getScore();
+                int lines = controller.getLineCount();
+                hudPane.updateScore(score);
+                hudPane.updateLines(lines);
 
-                renderer.drawNext(ngc, controller.getNext(), CELL_SIZE, CELL_SIZE);
+                if (lines != previousLines && lines % ROTATE_INTERVAL == 0) {
+                    worldAngle = (worldAngle + 90) % 360;
+                    worldView.getWorldFrame().setRotate(worldAngle);
+                    previousLines = lines;
+                } else if (lines != previousLines) {
+                    previousLines = lines;
+                }
+
+                renderer.drawNext(
+                        nextPane.getNextCanvas().getGraphicsContext2D(),
+                        controller.getNext(),
+                        nextPane.getNextCellSize(),
+                        nextPane.getNextCellSize());
+
+                int rotateRemain = ROTATE_INTERVAL - (lines % ROTATE_INTERVAL);
+                int remainScore = Math.max(0, TARGET_SCORE - score);
+                hudPane.updateDialogue(score, rotateRemain, remainScore);
             }
         };
 
@@ -171,7 +183,7 @@ public class Main extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: black;");
 
-        Scene scene = new Scene(root, 450, 600);
+        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.SPACE) {
