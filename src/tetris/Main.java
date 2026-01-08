@@ -5,11 +5,16 @@ import java.util.Set;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import tetris.controller.GameController;
 import tetris.model.Board;
@@ -48,7 +53,7 @@ public class Main extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: black;");
 
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        Scene scene = createScaledScene(root);
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.SPACE) {
@@ -77,7 +82,9 @@ public class Main extends Application {
         NextPane nextPane = view.getNextPane();
         HudPane hudPane = view.getHudPane();
 
-        Scene scene = new Scene(view.getRoot(), WINDOW_WIDTH, WINDOW_HEIGHT);
+        view.getRoot().setPrefSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        view.getRoot().setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        Scene scene = createScaledScene(view.getRoot());
 
         // キー入力管理
         Set<KeyCode> keys = new HashSet<>();
@@ -164,7 +171,7 @@ public class Main extends Application {
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: black;");
 
-        Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        Scene scene = createScaledScene(root);
 
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.SPACE) {
@@ -177,6 +184,24 @@ public class Main extends Application {
 
     private void showGameOverScene(int score, int lines) {
         primaryStage.setScene(makeGameOverScene(score, lines));
+    }
+
+    private Scene createScaledScene(Parent content) {
+        if (content instanceof Region region) {
+            region.setPrefSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+            region.setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        }
+        double scale = computeScale();
+        Group root = new Group(content);
+        root.setScaleX(scale);
+        root.setScaleY(scale);
+        return new Scene(root, WINDOW_WIDTH * scale, WINDOW_HEIGHT * scale);
+    }
+
+    private double computeScale() {
+        Bounds bounds = Screen.getPrimary().getVisualBounds();
+        double scale = Math.min(bounds.getWidth() / WINDOW_WIDTH, bounds.getHeight() / WINDOW_HEIGHT);
+        return Math.min(scale, 1.0);
     }
 
     public static void main(String[] args) {
