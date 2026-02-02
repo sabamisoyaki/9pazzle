@@ -2,6 +2,7 @@ package tetris.view;
 
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class GameView {
@@ -31,10 +32,11 @@ public class GameView {
         leftColumn.setMinSize(leftWidth, leftHeight);
         leftColumn.setMaxSize(leftWidth, leftHeight);
 
-        VBox sideArea = new VBox(characterPane, hudPane);
+        StackPane sideArea = new StackPane(characterPane, hudPane);
         sideArea.setPrefSize(480, 1080);
         sideArea.setMinSize(480, 1080);
         sideArea.setMaxSize(480, 1080);
+        StackPane.setAlignment(hudPane, Pos.TOP_LEFT);
 
         root.setLeft(leftColumn);
         root.setRight(sideArea);

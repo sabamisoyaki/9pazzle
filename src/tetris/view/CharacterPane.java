@@ -19,18 +19,18 @@ public class CharacterPane extends StackPane {
     private final ImageView characterView;
 
     public CharacterPane() {
-        setPrefSize(480, 800);
-        setMinSize(480, 800);
-        setMaxSize(480, 800);
+        setPrefSize(480, 1080);
+        setMinSize(480, 1080);
+        setMaxSize(480, 1080);
 
-        Rectangle placeholder = new Rectangle(420, 760);
+        Rectangle placeholder = new Rectangle(460, 1040);
         placeholder.setFill(Color.web("#222"));
         placeholder.setStroke(Color.web("#555"));
         placeholder.setStrokeWidth(2);
 
         characterView = new ImageView();
-        characterView.setFitWidth(420);
-        characterView.setFitHeight(760);
+        characterView.setFitWidth(460);
+        characterView.setFitHeight(1040);
         characterView.setPreserveRatio(true);
 
         getChildren().addAll(placeholder, characterView);
