@@ -14,14 +14,20 @@ import javafx.scene.shape.Rectangle;
 
 public class CharacterPane extends StackPane {
 
+    private static final Path DEFAULT_BACKGROUND_IMAGE = Paths.get("images", "character-bg.png");
     private static final Path DEFAULT_CHARACTER_IMAGE = Paths.get("images", "character.png");
 
+    private final ImageView backgroundView;
     private final ImageView characterView;
 
     public CharacterPane() {
         setPrefSize(480, 1080);
         setMinSize(480, 1080);
         setMaxSize(480, 1080);
+
+        backgroundView = new ImageView();
+        backgroundView.setFitWidth(460);
+        backgroundView.setFitHeight(1040);
 
         Rectangle placeholder = new Rectangle(460, 1040);
         placeholder.setFill(Color.web("#222"));
@@ -33,8 +39,9 @@ public class CharacterPane extends StackPane {
         characterView.setFitHeight(1040);
         characterView.setPreserveRatio(true);
 
-        getChildren().addAll(placeholder, characterView);
+        getChildren().addAll(backgroundView, placeholder, characterView);
 
+        loadBackgroundImage(DEFAULT_BACKGROUND_IMAGE);
         loadCharacterImage(DEFAULT_CHARACTER_IMAGE);
     }
 
@@ -54,5 +61,15 @@ public class CharacterPane extends StackPane {
         } catch (FileNotFoundException e) {
             characterView.setImage(null);
         }
+    }
+
+    public void loadBackgroundImage(Path imagePath) {
+        if (imagePath == null || !Files.exists(imagePath)) {
+            backgroundView.setImage(null);
+            return;
+        }
+
+        Image image = new Image(imagePath.toUri().toString());
+        backgroundView.setImage(image);
     }
 }
