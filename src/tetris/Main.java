@@ -109,8 +109,8 @@ public class Main extends Application {
         renderer.drawNext(
                 nextPane.getNextCanvas().getGraphicsContext2D(),
                 controller.getNext(),
-                nextPane.getNextCellSize(),
-                nextPane.getNextCellSize());
+                0,
+                0);
 
         AnimationTimer timer = new AnimationTimer() {
 
@@ -147,8 +147,8 @@ public class Main extends Application {
                 renderer.drawNext(
                         nextPane.getNextCanvas().getGraphicsContext2D(),
                         controller.getNext(),
-                        nextPane.getNextCellSize(),
-                        nextPane.getNextCellSize());
+                        0,
+                        0);
 
                 hudPane.updateDialogue(score, lines);
             }

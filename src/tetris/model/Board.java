@@ -32,8 +32,8 @@ public class Board {
                     int newC = t.col + c + dCol;
 
                     if (newC < 0 || newC >= COLS) return false;
-                    if (newR < 0 || newR >= ROWS) return false;
-                    if (board[newR][newC] != 0) return false;
+                    if (newR >= ROWS) return false;
+                    if (newR >= 0 && board[newR][newC] != 0) return false;
                 }
             }
         }
@@ -54,8 +54,8 @@ public class Board {
                     int newC = t.col + c;
 
                     if (newC < 0 || newC >= COLS) return false;
-                    if (newR < 0 || newR >= ROWS) return false;
-                    if (board[newR][newC] != 0) return false;
+                    if (newR >= ROWS) return false;
+                    if (newR >= 0 && board[newR][newC] != 0) return false;
                 }
             }
         }
@@ -118,10 +118,11 @@ public class Board {
 
     public int clearCompletedLines() {
         int count = 0;
-        for (int r = 0; r < ROWS; r++) {
+        for (int r = ROWS - 1; r >= 0; r--) {
             if (isLineFull(r)) {
                 clearLine(r);
                 count++;
+                r++;
             }
         }
         totalClearedLines += count;
@@ -135,10 +136,10 @@ public class Board {
                     int br = row + r;
                     int bc = col + c;
 
-                    if (br < 0 || br >= ROWS || bc < 0 || bc >= COLS)
+                    if (br >= ROWS || bc < 0 || bc >= COLS)
                         return false;
 
-                    if (board[br][bc] != 0)
+                    if (br >= 0 && board[br][bc] != 0)
                         return false;
                 }
             }

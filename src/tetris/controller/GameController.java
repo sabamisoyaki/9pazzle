@@ -232,6 +232,11 @@ public class GameController {
         // 横移動（DAS / ARR 押しっぱ対応）
         // ====================================
 
+        if (left && right) {
+            left = false;
+            right = false;
+        }
+
         // ---- 左 ----
         if (left) {
             if (!prevLeft) {
