@@ -1,11 +1,23 @@
 package tetris.view;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
 
 public class HudPane extends VBox {
+
+    private static final Path DEFAULT_BACKGROUND_IMAGE = Paths.get("images", "hud-bg.png");
 
     private final Label scoreLabel;
     private final Label linesLabel;
@@ -31,6 +43,8 @@ public class HudPane extends VBox {
         dialogueLabel.setMaxWidth(420);
 
         getChildren().addAll(scoreLabel, linesLabel, dialogueLabel);
+
+        loadBackgroundImage(DEFAULT_BACKGROUND_IMAGE);
     }
 
     public void updateScore(int score) {
@@ -50,5 +64,28 @@ public class HudPane extends VBox {
                 score,
                 lines);
         dialogueLabel.setText(text);
+    }
+
+    public void loadBackgroundImage(Path imagePath) {
+        if (imagePath == null || !Files.exists(imagePath)) {
+            setBackground(null);
+            return;
+        }
+
+        Image image = new Image(imagePath.toUri().toString());
+        BackgroundSize size = new BackgroundSize(
+                100,
+                100,
+                true,
+                true,
+                false,
+                true);
+        BackgroundImage backgroundImage = new BackgroundImage(
+                image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                size);
+        setBackground(new Background(backgroundImage));
     }
 }
