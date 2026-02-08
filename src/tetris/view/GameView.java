@@ -29,8 +29,8 @@ public class GameView {
         double leftWidth = 1440;
         double leftHeight = 1080;
 
-        double playFieldSize = 900; // Wireframe square playfield size.
-        double nextHeight = 180; // Wireframe 7:1 vertical split (900:180).
+        double playFieldSize = 840; // Wireframe square playfield size.
+        double nextHeight = 168; // Wireframe 7:1 vertical split (840:168).
 
         this.playFieldPane = new DeviceFramePane(playFieldSize);
         this.nextPane = new NextPane(playFieldSize, nextHeight);
