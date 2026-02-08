@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -39,6 +40,7 @@ public class GameView {
 
         VBox leftColumn = new VBox(playFieldPane, nextPane);
         leftColumn.setAlignment(Pos.TOP_LEFT);
+        leftColumn.setPadding(new Insets(20, 0, 0, 20));
         leftColumn.setPrefSize(leftWidth, leftHeight);
         leftColumn.setMinSize(leftWidth, leftHeight);
         leftColumn.setMaxSize(leftWidth, leftHeight);
