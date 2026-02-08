@@ -92,7 +92,7 @@ public class Main extends Application {
             if (!keys.contains(code)) {
                 if (code == KeyCode.Z) {
                     playRotateAnimation(view.getRoot(), false, controller::rotateWorldClockwise);
-                } else if (code == KeyCode.X || code == KeyCode.UP) {
+                } else if (code == KeyCode.X) {
                     playRotateAnimation(view.getRoot(), true, controller::rotateWorldClockwise);
                 }
             }
