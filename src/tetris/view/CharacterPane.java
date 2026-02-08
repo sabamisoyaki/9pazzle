@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -16,9 +17,12 @@ public class CharacterPane extends StackPane {
 
     private static final Path DEFAULT_BACKGROUND_IMAGE = Paths.get("images", "character-bg.png");
     private static final Path DEFAULT_CHARACTER_IMAGE = Paths.get("images", "character.png");
+    private static final double DEFAULT_CHARACTER_WIDTH = 460;
+    private static final double DEFAULT_CHARACTER_HEIGHT = 1040;
 
     private final ImageView backgroundView;
     private final ImageView characterView;
+    private final Rectangle placeholder;
 
     public CharacterPane() {
         setPrefSize(480, 1080);
@@ -26,20 +30,21 @@ public class CharacterPane extends StackPane {
         setMaxSize(480, 1080);
 
         backgroundView = new ImageView();
-        backgroundView.setFitWidth(460);
-        backgroundView.setFitHeight(1040);
+        backgroundView.setFitWidth(DEFAULT_CHARACTER_WIDTH);
+        backgroundView.setFitHeight(DEFAULT_CHARACTER_HEIGHT);
 
-        Rectangle placeholder = new Rectangle(460, 1040);
+        placeholder = new Rectangle(DEFAULT_CHARACTER_WIDTH, DEFAULT_CHARACTER_HEIGHT);
         placeholder.setFill(Color.web("#222"));
         placeholder.setStroke(Color.web("#555"));
         placeholder.setStrokeWidth(2);
 
         characterView = new ImageView();
-        characterView.setFitWidth(460);
-        characterView.setFitHeight(1040);
+        characterView.setFitWidth(DEFAULT_CHARACTER_WIDTH);
+        characterView.setFitHeight(DEFAULT_CHARACTER_HEIGHT);
         characterView.setPreserveRatio(true);
 
         getChildren().addAll(backgroundView, placeholder, characterView);
+        StackPane.setAlignment(characterView, Pos.CENTER_LEFT);
 
         loadBackgroundImage(DEFAULT_BACKGROUND_IMAGE);
         loadCharacterImage(DEFAULT_CHARACTER_IMAGE);
@@ -47,6 +52,15 @@ public class CharacterPane extends StackPane {
 
     public ImageView getCharacterView() {
         return characterView;
+    }
+
+    public void setCharacterSize(double width, double height) {
+        backgroundView.setFitWidth(width);
+        backgroundView.setFitHeight(height);
+        placeholder.setWidth(width);
+        placeholder.setHeight(height);
+        characterView.setFitWidth(width);
+        characterView.setFitHeight(height);
     }
 
     public void loadCharacterImage(Path imagePath) {
