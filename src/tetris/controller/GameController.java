@@ -216,6 +216,7 @@ public class GameController {
     private boolean prevRight = false;
     private boolean prevZ = false;
     private boolean prevX = false;
+    private boolean prevUp = false;
     private boolean prevSpace = false;
 
     public void updateInput(Set<KeyCode> keys, long now) {
@@ -223,6 +224,7 @@ public class GameController {
         boolean left  = keys.contains(KeyCode.LEFT);
         boolean right = keys.contains(KeyCode.RIGHT);
         boolean down  = keys.contains(KeyCode.DOWN);
+        boolean up    = keys.contains(KeyCode.UP);
         boolean z     = keys.contains(KeyCode.Z);
         boolean x     = keys.contains(KeyCode.X);
         boolean space = keys.contains(KeyCode.SPACE);
@@ -291,6 +293,7 @@ public class GameController {
         prevRight = right;
         prevZ = z;
         prevX = x;
+        prevUp = up;
         prevSpace = space;
     }
 
