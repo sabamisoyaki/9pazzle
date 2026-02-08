@@ -82,18 +82,7 @@ public class Main extends Application {
         // キー入力管理
         Set<KeyCode> keys = new HashSet<>();
         scene.setOnKeyPressed(e -> {
-            KeyCode code = e.getCode();
-            if (code == KeyCode.UP) {
-                return;
-            }
-            if (!keys.contains(code)) {
-                if (code == KeyCode.Z) {
-                    controller.rotateWorldClockwise();
-                } else if (code == KeyCode.X) {
-                    controller.rotateWorldClockwise();
-                }
-            }
-            keys.add(code);
+            keys.add(e.getCode());
         });
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
