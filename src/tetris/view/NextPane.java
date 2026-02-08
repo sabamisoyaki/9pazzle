@@ -1,13 +1,22 @@
 package tetris.view;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
 public class NextPane extends StackPane {
 
+    private static final Path DEFAULT_BACKGROUND_IMAGE = Paths.get("images", "next-bg.png");
+
     private final Canvas nextCanvas;
     private final int nextCellSize;
+    private final ImageView backgroundView;
 
     public NextPane(double width, double height) {
         setPrefSize(width, height);
@@ -16,12 +25,18 @@ public class NextPane extends StackPane {
         setAlignment(Pos.CENTER);
         setStyle("-fx-background-color: #111;");
 
+        backgroundView = new ImageView();
+        backgroundView.setFitWidth(width);
+        backgroundView.setFitHeight(height);
+
         nextCanvas = new Canvas();
         nextCanvas.setWidth(width);
         nextCanvas.setHeight(height);
         nextCellSize = (int) Math.min(nextCanvas.getWidth() / 4, nextCanvas.getHeight() / 4);
 
-        getChildren().add(nextCanvas);
+        getChildren().addAll(backgroundView, nextCanvas);
+
+        loadBackgroundImage(DEFAULT_BACKGROUND_IMAGE);
     }
 
     public Canvas getNextCanvas() {
@@ -30,5 +45,15 @@ public class NextPane extends StackPane {
 
     public int getNextCellSize() {
         return nextCellSize;
+    }
+
+    public void loadBackgroundImage(Path imagePath) {
+        if (imagePath == null || !Files.exists(imagePath)) {
+            backgroundView.setImage(null);
+            return;
+        }
+
+        Image image = new Image(imagePath.toUri().toString());
+        backgroundView.setImage(image);
     }
 }

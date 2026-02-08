@@ -81,7 +81,9 @@ public class Main extends Application {
 
         // キー入力管理
         Set<KeyCode> keys = new HashSet<>();
-        scene.setOnKeyPressed(e -> keys.add(e.getCode()));
+        scene.setOnKeyPressed(e -> {
+            keys.add(e.getCode());
+        });
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
         // 初回描画
@@ -93,8 +95,8 @@ public class Main extends Application {
         renderer.drawNext(
                 nextPane.getNextCanvas().getGraphicsContext2D(),
                 controller.getNext(),
-                nextPane.getNextCellSize(),
-                nextPane.getNextCellSize());
+                0,
+                0);
 
         AnimationTimer timer = new AnimationTimer() {
 
@@ -131,8 +133,8 @@ public class Main extends Application {
                 renderer.drawNext(
                         nextPane.getNextCanvas().getGraphicsContext2D(),
                         controller.getNext(),
-                        nextPane.getNextCellSize(),
-                        nextPane.getNextCellSize());
+                        0,
+                        0);
 
                 hudPane.updateDialogue(score, lines);
             }
