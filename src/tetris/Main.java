@@ -4,19 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import tetris.controller.GameController;
 import tetris.model.Board;
 import tetris.view.GameView;
@@ -89,11 +83,14 @@ public class Main extends Application {
         Set<KeyCode> keys = new HashSet<>();
         scene.setOnKeyPressed(e -> {
             KeyCode code = e.getCode();
+            if (code == KeyCode.UP) {
+                return;
+            }
             if (!keys.contains(code)) {
                 if (code == KeyCode.Z) {
-                    playRotateAnimation(view.getRoot(), false);
-                } else if (code == KeyCode.X || code == KeyCode.UP) {
-                    playRotateAnimation(view.getRoot(), true);
+                    controller.rotateWorldClockwise();
+                } else if (code == KeyCode.X) {
+                    controller.rotateWorldClockwise();
                 }
             }
             keys.add(code);
@@ -156,20 +153,6 @@ public class Main extends Application {
 
         timer.start();
         return scene;
-    }
-
-    private void playRotateAnimation(BorderPane root, boolean clockwise) {
-        double angle = clockwise ? 6.0 : -6.0;
-        root.setRotate(0);
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(root.rotateProperty(), 0, Interpolator.EASE_BOTH)),
-                new KeyFrame(Duration.millis(250),
-                        new KeyValue(root.rotateProperty(), angle, Interpolator.EASE_BOTH)),
-                new KeyFrame(Duration.millis(500),
-                        new KeyValue(root.rotateProperty(), 0, Interpolator.EASE_BOTH))
-        );
-        timeline.play();
     }
 
     private void showGameScene() {
