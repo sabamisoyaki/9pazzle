@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -29,8 +30,8 @@ public class GameView {
         double leftWidth = 1440;
         double leftHeight = 1080;
 
-        double playFieldSize = 900; // Wireframe square playfield size.
-        double nextHeight = 180; // Wireframe 7:1 vertical split (900:180).
+        double playFieldSize = 840; // Wireframe square playfield size.
+        double nextHeight = 168; // Wireframe 7:1 vertical split (840:168).
 
         this.playFieldPane = new DeviceFramePane(playFieldSize);
         this.nextPane = new NextPane(playFieldSize, nextHeight);
@@ -39,6 +40,7 @@ public class GameView {
 
         VBox leftColumn = new VBox(playFieldPane, nextPane);
         leftColumn.setAlignment(Pos.TOP_LEFT);
+        leftColumn.setPadding(new Insets(20, 0, 0, 20));
         leftColumn.setPrefSize(leftWidth, leftHeight);
         leftColumn.setMinSize(leftWidth, leftHeight);
         leftColumn.setMaxSize(leftWidth, leftHeight);

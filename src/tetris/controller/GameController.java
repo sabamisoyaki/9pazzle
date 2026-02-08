@@ -267,6 +267,7 @@ public class GameController {
         // ====================================
         if (z && !prevZ) rotateLeft();
         if (x && !prevX) rotateRight();
+        if (up && !prevUp) rotateRight();
 
         // ====================================
         // ハードドロップ（単発）
