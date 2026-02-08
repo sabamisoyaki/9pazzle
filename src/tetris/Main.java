@@ -91,9 +91,9 @@ public class Main extends Application {
             KeyCode code = e.getCode();
             if (!keys.contains(code)) {
                 if (code == KeyCode.Z) {
-                    playRotateAnimation(view.getRoot(), false);
+                    playRotateAnimation(view.getRoot(), false, controller::rotateWorldClockwise);
                 } else if (code == KeyCode.X || code == KeyCode.UP) {
-                    playRotateAnimation(view.getRoot(), true);
+                    playRotateAnimation(view.getRoot(), true, controller::rotateWorldClockwise);
                 }
             }
             keys.add(code);
@@ -158,7 +158,7 @@ public class Main extends Application {
         return scene;
     }
 
-    private void playRotateAnimation(BorderPane root, boolean clockwise) {
+    private void playRotateAnimation(BorderPane root, boolean clockwise, Runnable onFinished) {
         double angle = clockwise ? 6.0 : -6.0;
         root.setRotate(0);
         Timeline timeline = new Timeline(
@@ -169,6 +169,11 @@ public class Main extends Application {
                 new KeyFrame(Duration.millis(500),
                         new KeyValue(root.rotateProperty(), 0, Interpolator.EASE_BOTH))
         );
+        timeline.setOnFinished(event -> {
+            if (onFinished != null) {
+                onFinished.run();
+            }
+        });
         timeline.play();
     }
 

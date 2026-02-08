@@ -58,6 +58,7 @@ public class GameController {
     public int getScore()     { return score; }
     public int getLineCount() { return totalLines; }
     public Tetromino getNext(){ return next; }
+    public void rotateWorldClockwise() { board.rotateClockwise(); }
 
     // ==========================
     //   SRS キックテーブル
