@@ -80,9 +80,6 @@ public class Main extends Application {
             if (e.getCode() == KeyCode.SPACE) {
                 showGameScene();
             }
-            if (e.getCode() == KeyCode.C) {
-                showEndCreditScene(DEFAULT_END_CREDIT_JSON);
-            }
         });
 
         return scene;
@@ -137,7 +134,9 @@ public class Main extends Application {
                 // ====== TRUE GAME OVER ======
                 if (controller.isTrueGameOver()) {
                     stop();
-                    showGameOverScene(controller.getScore(), controller.getLineCount());
+                    int finalScore = controller.getScore();
+                    int finalLines = controller.getLineCount();
+                    showEndCreditScene(DEFAULT_END_CREDIT_JSON, () -> showGameOverScene(finalScore, finalLines));
                     return;
                 }
 
@@ -188,7 +187,7 @@ public class Main extends Application {
         Label detail = new Label("Score: " + score + "\nLines: " + lines);
         detail.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
 
-        Label retry = new Label("Press SPACE to Retry\nPress C to View End Credits");
+        Label retry = new Label("Press SPACE to Retry");
         retry.setStyle("-fx-font-size: 18px; -fx-text-fill: gray;");
 
         VBox root = new VBox(20, title, detail, retry);
@@ -200,9 +199,6 @@ public class Main extends Application {
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.SPACE) {
                 showGameScene();
-            }
-            if (e.getCode() == KeyCode.C) {
-                showEndCreditScene(DEFAULT_END_CREDIT_JSON);
             }
         });
 
@@ -217,31 +213,29 @@ public class Main extends Application {
     // =====================================================
     //  エンドクレジット画面
     // =====================================================
-    private Scene makeEndCreditScene(String creditJson) {
+    private Scene makeEndCreditScene(String creditJson, Runnable onComplete) {
 
         EndCreditPane creditPane = new EndCreditPane(creditJson, END_CREDIT_BACKGROUND_IMAGE);
         Scene scene = new Scene(creditPane.getRoot(), WINDOW_WIDTH, WINDOW_HEIGHT);
 
         Timeline timeline = creditPane.buildScrollAnimation();
-        timeline.setOnFinished(e -> showStartScene());
+        Runnable completeAction = onComplete != null ? onComplete : this::showStartScene;
+
+        timeline.setOnFinished(e -> completeAction.run());
         timeline.play();
 
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ESCAPE) {
+            if (e.getCode() == KeyCode.ESCAPE || e.getCode() == KeyCode.SPACE) {
                 timeline.stop();
-                showStartScene();
-            }
-            if (e.getCode() == KeyCode.SPACE) {
-                timeline.stop();
-                showGameScene();
+                completeAction.run();
             }
         });
 
         return scene;
     }
 
-    private void showEndCreditScene(String creditJson) {
-        primaryStage.setScene(makeEndCreditScene(creditJson));
+    private void showEndCreditScene(String creditJson, Runnable onComplete) {
+        primaryStage.setScene(makeEndCreditScene(creditJson, onComplete));
     }
 
 
