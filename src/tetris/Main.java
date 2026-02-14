@@ -1,5 +1,8 @@
 package tetris;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +22,8 @@ import tetris.view.NextPane;
 import tetris.view.Render;
 
 public class Main extends Application {
+
+    private static final Path DEFAULT_CHARACTER_IMAGE = Paths.get("images", "character.png");
 
     private Stage primaryStage;
     private static final int WINDOW_WIDTH = 1920;
@@ -102,6 +107,8 @@ public class Main extends Application {
 
             private long lastFall = 0;
             private final long FALL_SPEED = 300_000_000L;
+            private String currentCharacterKey = "";
+
             @Override
             public void handle(long now) {
 
@@ -137,11 +144,39 @@ public class Main extends Application {
                         0);
 
                 hudPane.updateDialogue(score, lines);
+
+                String nextCharacterKey = buildCharacterImageKey(controller);
+                if (!nextCharacterKey.equals(currentCharacterKey)) {
+                    view.getCharacterPane().loadCharacterImage(resolveCharacterImagePath(nextCharacterKey));
+                    currentCharacterKey = nextCharacterKey;
+                }
             }
         };
 
         timer.start();
         return scene;
+    }
+
+    private String buildCharacterImageKey(GameController controller) {
+        int worldRotated = controller.getWorldRotateCount();
+        int placedMinos = controller.getPlacedMinoCount();
+
+        if (worldRotated >= 5) return "character-rotate-5.png";
+        if (worldRotated >= 3) return "character-rotate-3.png";
+        if (worldRotated >= 1) return "character-rotate-1.png";
+
+        if (placedMinos >= 40) return "character-placed-40.png";
+        if (placedMinos >= 20) return "character-placed-20.png";
+
+        return "character.png";
+    }
+
+    private Path resolveCharacterImagePath(String fileName) {
+        Path candidate = Paths.get("images", fileName);
+        if (Files.exists(candidate)) {
+            return candidate;
+        }
+        return DEFAULT_CHARACTER_IMAGE;
     }
 
     private void showGameScene() {

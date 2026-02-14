@@ -23,6 +23,7 @@ public class GameController {
 
     // ワールド回転（重力反転ギミック）の閾値
     private int nextRotateThreshold = 3;
+    private int worldRotateCount = 0;
 
     // 仮ゲームオーバー（4回で真のゲームオーバー）
     private int gameOverStreak = 0;
@@ -57,8 +58,10 @@ public class GameController {
 
     public int getScore()     { return score; }
     public int getLineCount() { return totalLines; }
+    public int getPlacedMinoCount() { return setteto; }
+    public int getWorldRotateCount() { return worldRotateCount; }
     public Tetromino getNext(){ return next; }
-    public void rotateWorldClockwise() { board.rotateClockwise(); }
+    public void rotateWorldClockwise() { rotateWorldAndCount(); }
 
     // ==========================
     //   SRS キックテーブル
@@ -336,7 +339,7 @@ public class GameController {
 
         // ライン閾値による「盤面回転」
         if (board.getTotalClearedLines() >= nextRotateThreshold) {
-            board.rotateClockwise();
+            rotateWorldAndCount();
             nextRotateThreshold += 3;
         }
 
@@ -349,7 +352,7 @@ public class GameController {
             gameOverStreak++;
             System.out.println("TEMP GAME OVER (" + gameOverStreak + "/4)");
 
-            board.rotateClockwise();
+            rotateWorldAndCount();
 
             if (gameOverStreak >= maxStreak) {
                 trueGameOver = true;
@@ -365,6 +368,11 @@ public class GameController {
         groundStartTime = 0;
         setteto++;
         System.out.println(setteto);
+    }
+
+    private void rotateWorldAndCount() {
+        board.rotateClockwise();
+        worldRotateCount++;
     }
     
 
