@@ -13,3 +13,8 @@ How to run (Windows)
 Notes
 - run.bat auto-detects Java from JAVA_HOME or PATH.
 - If the JavaFX SDK path is different, update the FX path in run.bat.
+
+BGM (optional)
+- Place an MP3 file at: audio\bgm.mp3
+- The game will loop this file during gameplay.
+- If the file is missing, the game runs silently.

@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.Timeline;
@@ -20,7 +22,10 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import tetris.controller.GameController;
 import tetris.model.Board;
 import tetris.view.EndCreditPane;
@@ -34,6 +39,8 @@ public class Main extends Application {
     private Stage primaryStage;
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
+    private static final Path BGM_PATH = Path.of("audio", "bgm.mp3");
+    private MediaPlayer bgmPlayer;
 
     private static final Path START_BACKGROUND_IMAGE = Paths.get("images", "start-bg.png");
     private static final Path GAME_OVER_BACKGROUND_IMAGE = Paths.get("images", "game-over-bg.png");
@@ -55,8 +62,43 @@ public class Main extends Application {
         this.primaryStage = stage;
         stage.setTitle("TETRIS");
         stage.setResizable(false);
+        initBgmPlayer();
         showStartScene();
         stage.show();
+    }
+
+    private void initBgmPlayer() {
+        if (!Files.exists(BGM_PATH)) {
+            System.out.println("[BGM] Not found: " + BGM_PATH.toAbsolutePath());
+            return;
+        }
+
+        try {
+            Media media = new Media(BGM_PATH.toUri().toString());
+            bgmPlayer = new MediaPlayer(media);
+            bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            bgmPlayer.setVolume(0.35);
+        } catch (Exception e) {
+            System.out.println("[BGM] Failed to load: " + e.getMessage());
+            bgmPlayer = null;
+        }
+    }
+
+    private void playBgm() {
+        if (bgmPlayer == null) {
+            return;
+        }
+        if (bgmPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            bgmPlayer.play();
+        }
+    }
+
+    private void stopBgm() {
+        if (bgmPlayer == null) {
+            return;
+        }
+        bgmPlayer.stop();
+        bgmPlayer.seek(Duration.ZERO);
     }
 
     // =====================================================
@@ -86,6 +128,7 @@ public class Main extends Application {
     }
 
     private void showStartScene() {
+        stopBgm();
         primaryStage.setScene(makeStartScene());
     }
 
@@ -181,6 +224,7 @@ public class Main extends Application {
     }
 
     private void showGameScene() {
+        playBgm();
         primaryStage.setScene(makeGameScene());
     }
 
@@ -214,6 +258,7 @@ public class Main extends Application {
     }
 
     private void showGameOverScene(int score, int lines) {
+        stopBgm();
         primaryStage.setScene(makeGameOverScene(score, lines));
     }
 
