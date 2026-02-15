@@ -23,6 +23,9 @@ public class GameController {
 
     // ワールド回転（重力反転ギミック）の閾値
     private int nextRotateThreshold = 3;
+    private int worldRotateCount = 0;
+    private int worldRotateStep = 0;
+    private int worldRotateLoopCount = 0;
 
     // 仮ゲームオーバー（4回で真のゲームオーバー）
     private int gameOverStreak = 0;
@@ -57,7 +60,12 @@ public class GameController {
 
     public int getScore()     { return score; }
     public int getLineCount() { return totalLines; }
+    public int getPlacedMinoCount() { return setteto; }
+    public int getWorldRotateCount() { return worldRotateCount; }
+    public int getWorldRotateStep() { return worldRotateStep; }
+    public int getWorldRotateLoopCount() { return worldRotateLoopCount; }
     public Tetromino getNext(){ return next; }
+    public void rotateWorldClockwise() { rotateWorldAndCount(); }
 
     // ==========================
     //   SRS キックテーブル
@@ -223,14 +231,19 @@ public class GameController {
         boolean left  = keys.contains(KeyCode.LEFT);
         boolean right = keys.contains(KeyCode.RIGHT);
         boolean down  = keys.contains(KeyCode.DOWN);
+        boolean up    = keys.contains(KeyCode.UP);
         boolean z     = keys.contains(KeyCode.Z);
         boolean x     = keys.contains(KeyCode.X);
-        boolean up    = keys.contains(KeyCode.UP);
         boolean space = keys.contains(KeyCode.SPACE);
 
         // ====================================
         // 横移動（DAS / ARR 押しっぱ対応）
         // ====================================
+
+        if (left && right) {
+            left = false;
+            right = false;
+        }
 
         // ---- 左 ----
         if (left) {
@@ -263,7 +276,7 @@ public class GameController {
         // ====================================
         if (z && !prevZ) rotateLeft();
         if (x && !prevX) rotateRight();
-        if (up && !prevUp) rotateRight();   // ↑ も右回転に割り当て
+        if (up && !prevUp) rotateRight();
 
         // ====================================
         // ハードドロップ（単発）
@@ -330,7 +343,7 @@ public class GameController {
 
         // ライン閾値による「盤面回転」
         if (board.getTotalClearedLines() >= nextRotateThreshold) {
-            board.rotateClockwise();
+            rotateWorldAndCount();
             nextRotateThreshold += 3;
         }
 
@@ -343,7 +356,7 @@ public class GameController {
             gameOverStreak++;
             System.out.println("TEMP GAME OVER (" + gameOverStreak + "/4)");
 
-            board.rotateClockwise();
+            rotateWorldAndCount();
 
             if (gameOverStreak >= maxStreak) {
                 trueGameOver = true;
@@ -359,6 +372,15 @@ public class GameController {
         groundStartTime = 0;
         setteto++;
         System.out.println(setteto);
+    }
+
+    private void rotateWorldAndCount() {
+        board.rotateClockwise();
+        worldRotateCount++;
+        worldRotateStep = (worldRotateStep % 3) + 1;
+        if (worldRotateStep == 1 && worldRotateCount >= 4) {
+            worldRotateLoopCount++;
+        }
     }
     
 

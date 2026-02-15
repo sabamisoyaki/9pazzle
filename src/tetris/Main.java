@@ -81,7 +81,9 @@ public class Main extends Application {
 
         // キー入力管理
         Set<KeyCode> keys = new HashSet<>();
-        scene.setOnKeyPressed(e -> keys.add(e.getCode()));
+        scene.setOnKeyPressed(e -> {
+            keys.add(e.getCode());
+        });
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
         // 初回描画
@@ -93,13 +95,15 @@ public class Main extends Application {
         renderer.drawNext(
                 nextPane.getNextCanvas().getGraphicsContext2D(),
                 controller.getNext(),
-                nextPane.getNextCellSize(),
-                nextPane.getNextCellSize());
+                0,
+                0);
 
         AnimationTimer timer = new AnimationTimer() {
 
             private long lastFall = 0;
             private final long FALL_SPEED = 300_000_000L;
+            private int lastWorldRotateStep = -1;
+
             @Override
             public void handle(long now) {
 
@@ -131,10 +135,16 @@ public class Main extends Application {
                 renderer.drawNext(
                         nextPane.getNextCanvas().getGraphicsContext2D(),
                         controller.getNext(),
-                        nextPane.getNextCellSize(),
-                        nextPane.getNextCellSize());
+                        0,
+                        0);
 
                 hudPane.updateDialogue(score, lines);
+
+                int worldRotateStep = controller.getWorldRotateStep();
+                if (worldRotateStep != lastWorldRotateStep) {
+                    view.getCharacterPane().updateCharacterForWorldRotateStep(worldRotateStep);
+                    lastWorldRotateStep = worldRotateStep;
+                }
             }
         };
 
