@@ -69,12 +69,19 @@ public class CharacterPane extends StackPane {
     public void updateCharacterForWorldRotateCount(int rotateCount) {
         Path imagePath = DEFAULT_CHARACTER_IMAGE;
 
-        if (rotateCount >= 3) {
-            imagePath = ROTATE_CHARACTER_IMAGE_3;
-        } else if (rotateCount >= 2) {
-            imagePath = ROTATE_CHARACTER_IMAGE_2;
-        } else if (rotateCount >= 1) {
-            imagePath = ROTATE_CHARACTER_IMAGE_1;
+        if (rotateCount > 0) {
+            int rotateIndex = (rotateCount - 1) % 3;
+            switch (rotateIndex) {
+                case 0:
+                    imagePath = ROTATE_CHARACTER_IMAGE_1;
+                    break;
+                case 1:
+                    imagePath = ROTATE_CHARACTER_IMAGE_2;
+                    break;
+                default:
+                    imagePath = ROTATE_CHARACTER_IMAGE_3;
+                    break;
+            }
         }
 
         if (!Files.exists(imagePath)) {
