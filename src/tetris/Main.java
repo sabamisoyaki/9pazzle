@@ -102,7 +102,7 @@ public class Main extends Application {
 
             private long lastFall = 0;
             private final long FALL_SPEED = 300_000_000L;
-            private int lastWorldRotateCount = -1;
+            private int lastWorldRotateStep = -1;
 
             @Override
             public void handle(long now) {
@@ -140,10 +140,10 @@ public class Main extends Application {
 
                 hudPane.updateDialogue(score, lines);
 
-                int worldRotateCount = controller.getWorldRotateCount();
-                if (worldRotateCount != lastWorldRotateCount) {
-                    view.getCharacterPane().updateCharacterForWorldRotateCount(worldRotateCount);
-                    lastWorldRotateCount = worldRotateCount;
+                int worldRotateStep = controller.getWorldRotateStep();
+                if (worldRotateStep != lastWorldRotateStep) {
+                    view.getCharacterPane().updateCharacterForWorldRotateStep(worldRotateStep);
+                    lastWorldRotateStep = worldRotateStep;
                 }
             }
         };

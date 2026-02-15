@@ -24,6 +24,8 @@ public class GameController {
     // ワールド回転（重力反転ギミック）の閾値
     private int nextRotateThreshold = 3;
     private int worldRotateCount = 0;
+    private int worldRotateStep = 0;
+    private int worldRotateLoopCount = 0;
 
     // 仮ゲームオーバー（4回で真のゲームオーバー）
     private int gameOverStreak = 0;
@@ -60,6 +62,8 @@ public class GameController {
     public int getLineCount() { return totalLines; }
     public int getPlacedMinoCount() { return setteto; }
     public int getWorldRotateCount() { return worldRotateCount; }
+    public int getWorldRotateStep() { return worldRotateStep; }
+    public int getWorldRotateLoopCount() { return worldRotateLoopCount; }
     public Tetromino getNext(){ return next; }
     public void rotateWorldClockwise() { rotateWorldAndCount(); }
 
@@ -373,6 +377,10 @@ public class GameController {
     private void rotateWorldAndCount() {
         board.rotateClockwise();
         worldRotateCount++;
+        worldRotateStep = (worldRotateStep % 3) + 1;
+        if (worldRotateStep == 1 && worldRotateCount >= 4) {
+            worldRotateLoopCount++;
+        }
     }
     
 
