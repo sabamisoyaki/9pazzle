@@ -17,6 +17,9 @@ public class CharacterPane extends StackPane {
 
     private static final Path DEFAULT_BACKGROUND_IMAGE = Paths.get("images", "character-bg.png");
     private static final Path DEFAULT_CHARACTER_IMAGE = Paths.get("images", "character.png");
+    private static final Path ROTATE_CHARACTER_IMAGE_1 = Paths.get("images", "character-rotate-1.png");
+    private static final Path ROTATE_CHARACTER_IMAGE_2 = Paths.get("images", "character-rotate-2.png");
+    private static final Path ROTATE_CHARACTER_IMAGE_3 = Paths.get("images", "character-rotate-3.png");
     private static final double DEFAULT_CHARACTER_WIDTH = 460;
     private static final double DEFAULT_CHARACTER_HEIGHT = 1040;
 
@@ -61,6 +64,30 @@ public class CharacterPane extends StackPane {
         placeholder.setHeight(height);
         characterView.setFitWidth(width);
         characterView.setFitHeight(height);
+    }
+
+    public void updateCharacterForWorldRotateStep(int rotateStep) {
+        Path imagePath = DEFAULT_CHARACTER_IMAGE;
+
+        switch (rotateStep) {
+            case 1:
+                imagePath = ROTATE_CHARACTER_IMAGE_1;
+                break;
+            case 2:
+                imagePath = ROTATE_CHARACTER_IMAGE_2;
+                break;
+            case 3:
+                imagePath = ROTATE_CHARACTER_IMAGE_3;
+                break;
+            default:
+                break;
+        }
+
+        if (!Files.exists(imagePath)) {
+            imagePath = DEFAULT_CHARACTER_IMAGE;
+        }
+
+        loadCharacterImage(imagePath);
     }
 
     public void loadCharacterImage(Path imagePath) {

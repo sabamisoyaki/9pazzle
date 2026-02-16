@@ -31,7 +31,7 @@ if not exist "%FX%" (
 )
 
 "%JAVA%" --module-path "%FX%" ^
-       --add-modules javafx.controls,javafx.graphics,javafx.fxml ^
+       --add-modules javafx.controls,javafx.graphics,javafx.fxml,javafx.media ^
        -jar app.jar
 
 if errorlevel 1 (
