@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.Timeline;
@@ -28,6 +26,9 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import tetris.controller.GameController;
 import tetris.model.Board;
+import tetris.panic.BgmPanicController;
+import tetris.panic.BoardAdapter;
+import tetris.panic.DangerMeter;
 import tetris.view.EndCreditPane;
 import tetris.view.GameView;
 import tetris.view.HudPane;
@@ -170,11 +171,18 @@ public class Main extends Application {
         AnimationTimer timer = new AnimationTimer() {
 
             private long lastFall = 0;
+            private long lastFrameNanos = 0;
             private final long FALL_SPEED = 300_000_000L;
             private int lastWorldRotateStep = -1;
+            private final DangerMeter dangerMeter = new DangerMeter(new BoardAdapter(controller.getBoard()));
+            private final BgmPanicController panicController = new BgmPanicController(bgmPlayer);
 
             @Override
             public void handle(long now) {
+                double deltaTimeSec = (lastFrameNanos == 0)
+                        ? (1.0 / 60.0)
+                        : ((now - lastFrameNanos) / 1_000_000_000.0);
+                lastFrameNanos = now;
 
                 // ====== TRUE GAME OVER ======
                 if (controller.isTrueGameOver()) {
@@ -216,6 +224,9 @@ public class Main extends Application {
                     view.getCharacterPane().updateCharacterForWorldRotateStep(worldRotateStep);
                     lastWorldRotateStep = worldRotateStep;
                 }
+
+                double danger = dangerMeter.computeDanger();
+                panicController.update(deltaTimeSec, danger);
             }
         };
 
