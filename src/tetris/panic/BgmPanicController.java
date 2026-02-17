@@ -24,6 +24,11 @@ public class BgmPanicController {
     private static final double ACCENT_DURATION_SEC = 0.30;
     private static final double ACCENT_MAX_BOOST = 0.03;
 
+    // tiny increments on every frame can create audible artifacts on some backends.
+    private static final double RATE_APPLY_EPS = 0.005;
+    // limit upward ramp speed to avoid zipper noise when rising.
+    private static final double MAX_RATE_UP_PER_SEC = 0.18;
+
     private final MediaPlayer mediaPlayer;
     private final double smoothingK;
     private final boolean debugLog;
@@ -68,10 +73,25 @@ public class BgmPanicController {
 
         double alpha = 1.0 - Math.exp(-smoothingK * Math.max(deltaTimeSec, 0.0));
         currentRate += (targetRate - currentRate) * alpha;
+
+        // Extra rise limiter for better audio stability when speeding up.
+        if (deltaTimeSec > 0.0) {
+            double maxRise = MAX_RATE_UP_PER_SEC * deltaTimeSec;
+            double maxAllowed = mediaPlayer.getRate() + maxRise;
+            currentRate = Math.min(currentRate, maxAllowed);
+        }
+
         currentRate = clamp(currentRate, NORMAL_RATE, MAX_RATE);
 
-        if (Math.abs(mediaPlayer.getRate() - currentRate) > 1e-4) {
+        double oldRate = mediaPlayer.getRate();
+        if (Math.abs(oldRate - currentRate) > RATE_APPLY_EPS) {
             mediaPlayer.setRate(currentRate);
+
+            // Requested by user: print when playback speed increases.
+            if (currentRate > oldRate) {
+                System.out.printf("[BGM-RATE-UP] %.3f -> %.3f (danger=%.1f, state=%s)%n",
+                        oldRate, currentRate, danger, state);
+            }
         }
 
         if (debugLog) {
