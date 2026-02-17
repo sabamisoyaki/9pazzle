@@ -20,15 +20,14 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import tetris.controller.GameController;
 import tetris.model.Board;
-import tetris.panic.BgmPanicController;
 import tetris.panic.BoardAdapter;
+import tetris.panic.BgmPanicFeatureOrchestrator;
 import tetris.panic.DangerMeter;
+import tetris.panic.DynamicBgmEngine;
+import tetris.panic.PanicTempoMapper;
 import tetris.view.EndCreditPane;
 import tetris.view.GameView;
 import tetris.view.HudPane;
@@ -41,7 +40,7 @@ public class Main extends Application {
     private static final int WINDOW_WIDTH = 1920;
     private static final int WINDOW_HEIGHT = 1080;
     private static final Path BGM_PATH = Path.of("audio", "bgm.mp3");
-    private MediaPlayer bgmPlayer;
+    private DynamicBgmEngine bgmEngine;
 
     private static final Path START_BACKGROUND_IMAGE = Paths.get("images", "start-bg.png");
     private static final Path GAME_OVER_BACKGROUND_IMAGE = Paths.get("images", "game-over-bg.png");
@@ -63,43 +62,38 @@ public class Main extends Application {
         this.primaryStage = stage;
         stage.setTitle("TETRIS");
         stage.setResizable(false);
-        initBgmPlayer();
+        initBgmEngine();
         showStartScene();
         stage.show();
     }
 
-    private void initBgmPlayer() {
+    private void initBgmEngine() {
         if (!Files.exists(BGM_PATH)) {
             System.out.println("[BGM] Not found: " + BGM_PATH.toAbsolutePath());
             return;
         }
 
         try {
-            Media media = new Media(BGM_PATH.toUri().toString());
-            bgmPlayer = new MediaPlayer(media);
-            bgmPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-            bgmPlayer.setVolume(0.35);
+            bgmEngine = new DynamicBgmEngine(BGM_PATH);
+            bgmEngine.setVolume(0.35);
         } catch (Exception e) {
-            System.out.println("[BGM] Failed to load: " + e.getMessage());
-            bgmPlayer = null;
+            System.out.println("[BGM] Failed to init dynamic engine: " + e.getMessage());
+            bgmEngine = null;
         }
     }
 
     private void playBgm() {
-        if (bgmPlayer == null) {
+        if (bgmEngine == null) {
             return;
         }
-        if (bgmPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-            bgmPlayer.play();
-        }
+        bgmEngine.start();
     }
 
     private void stopBgm() {
-        if (bgmPlayer == null) {
+        if (bgmEngine == null) {
             return;
         }
-        bgmPlayer.stop();
-        bgmPlayer.seek(Duration.ZERO);
+        bgmEngine.stop();
     }
 
     // =====================================================
@@ -175,7 +169,10 @@ public class Main extends Application {
             private final long FALL_SPEED = 300_000_000L;
             private int lastWorldRotateStep = -1;
             private final DangerMeter dangerMeter = new DangerMeter(new BoardAdapter(controller.getBoard()));
-            private final BgmPanicController panicController = new BgmPanicController(bgmPlayer);
+            private final BgmPanicFeatureOrchestrator panicFeature = new BgmPanicFeatureOrchestrator(
+                    dangerMeter,
+                    new PanicTempoMapper(1.18),
+                    bgmEngine);
 
             @Override
             public void handle(long now) {
@@ -225,8 +222,7 @@ public class Main extends Application {
                     lastWorldRotateStep = worldRotateStep;
                 }
 
-                double danger = dangerMeter.computeDanger();
-                panicController.update(deltaTimeSec, danger);
+                panicFeature.update(deltaTimeSec);
             }
         };
 
