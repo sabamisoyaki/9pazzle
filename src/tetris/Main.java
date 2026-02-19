@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.Timeline;
@@ -156,6 +154,10 @@ public class Main extends Application {
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
         // 初回描画
+        renderer.drawGridFrame(
+                view.getPlayFieldPane().getGridFrameCanvas().getGraphicsContext2D(),
+                Board.ROWS,
+                Board.COLS);
         renderer.drawAll(
                 view.getPlayFieldPane().getPlayfieldCanvas().getGraphicsContext2D(),
                 controller.getBoard(),
@@ -198,6 +200,11 @@ public class Main extends Application {
                         controller.getCurrent(),
                         controller.getGhost());
 
+                double opennessTarget = Math.min(1.0, 0.28 + (controller.getLineCount() * 0.03));
+                view.getPlayFieldPane().animateMouthOpen(opennessTarget, Duration.millis(180));
+                view.getPlayFieldPane().setSaliva(Math.min(1.0, 0.18 + (controller.getScore() / 2500.0)));
+                view.getPlayFieldPane().setTremor(Math.min(1.0, controller.getWorldRotateCount() * 0.08));
+
                 int score = controller.getScore();
                 int lines = controller.getLineCount();
                 hudPane.updateScore(score);
@@ -219,6 +226,7 @@ public class Main extends Application {
             }
         };
 
+        view.getPlayFieldPane().playMouthBreathLoop(0.22, 0.38, Duration.seconds(3.2));
         timer.start();
         return scene;
     }
