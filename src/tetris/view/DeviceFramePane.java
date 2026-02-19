@@ -19,7 +19,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -35,11 +34,10 @@ public class DeviceFramePane extends Pane {
     private final Canvas blocksCanvas;
 
     private final double frameSize;
-    private final DoubleProperty mouthOpen = new SimpleDoubleProperty(0.35);
-    private final DoubleProperty saliva = new SimpleDoubleProperty(0.15);
+    private final DoubleProperty mouthOpen = new SimpleDoubleProperty(0.30);
+    private final DoubleProperty saliva = new SimpleDoubleProperty(0.10);
     private final DoubleProperty tremor = new SimpleDoubleProperty(0.0);
 
-    private final Timeline mouthRedrawLoop;
     private Timeline mouthOpenTimeline;
 
     public DeviceFramePane(double frameSize) {
@@ -53,6 +51,7 @@ public class DeviceFramePane extends Pane {
         realPhotoBackgroundView.setFitWidth(frameSize);
         realPhotoBackgroundView.setFitHeight(frameSize);
         realPhotoBackgroundView.setPreserveRatio(false);
+        realPhotoBackgroundView.setOpacity(0.75);
 
         mouthBackgroundCanvas = new Canvas(frameSize, frameSize);
         gridFrameCanvas = new Canvas(frameSize, frameSize);
@@ -73,15 +72,9 @@ public class DeviceFramePane extends Pane {
         getChildren().add(playfieldStack);
 
         mouthOpen.addListener((obs, oldValue, newValue) -> drawMouthBackground());
-        saliva.addListener((obs, oldValue, newValue) -> drawMouthBackground());
-        tremor.addListener((obs, oldValue, newValue) -> drawMouthBackground());
 
         loadRealPhotoBackground(DEFAULT_PHOTO_BACKGROUND);
         drawMouthBackground();
-
-        mouthRedrawLoop = new Timeline(new KeyFrame(Duration.millis(33), e -> drawMouthBackground()));
-        mouthRedrawLoop.setCycleCount(Animation.INDEFINITE);
-        mouthRedrawLoop.play();
     }
 
     /**
@@ -120,32 +113,30 @@ public class DeviceFramePane extends Pane {
         realPhotoBackgroundView.setImage(image);
     }
 
-    public double getMouthOpen() {
-        return mouthOpen.get();
+    /**
+     * Main game-logic API for layered mouth effects.
+     */
+    public void updateMouthEffects(double mouthOpen, double saliva, double tremor) {
+        this.mouthOpen.set(clamp01(mouthOpen));
+        this.saliva.set(clamp01(saliva));
+        this.tremor.set(clamp01(tremor));
+        drawMouthBackground();
     }
 
-    public void setMouthOpen(double value) {
-        mouthOpen.set(clamp01(value));
+    public double getMouthOpen() {
+        return mouthOpen.get();
     }
 
     public double getSaliva() {
         return saliva.get();
     }
 
-    public void setSaliva(double value) {
-        saliva.set(clamp01(value));
-    }
-
     public double getTremor() {
         return tremor.get();
     }
 
-    public void setTremor(double value) {
-        tremor.set(clamp01(value));
-    }
-
     /**
-     * Example API for game-logic-side control.
+     * Optional helper for future state transitions.
      */
     public void animateMouthOpen(double targetMouthOpen, Duration duration) {
         if (mouthOpenTimeline != null) {
@@ -177,59 +168,58 @@ public class DeviceFramePane extends Pane {
         double salivaAmount = saliva.get();
         double tremorAmount = tremor.get();
 
+        // subtle horizontal tremor only, max ±2px
         double now = System.nanoTime() * 0.000000001;
-        double tremorOffsetX = Math.sin(now * 19.0) * 8.0 * tremorAmount;
-        double tremorOffsetY = Math.cos(now * 16.5) * 6.0 * tremorAmount;
+        double tremorOffsetX = Math.sin(now * 15.0) * 2.0 * tremorAmount;
 
-        LinearGradient baseTint = new LinearGradient(
+        // Abstract mouth-like background (dark wine -> deep red), tuned for readability.
+        double stretch = 0.72 + (open * 0.22);
+        double brightness = 0.20 + (open * 0.10);
+
+        LinearGradient baseGradient = new LinearGradient(
                 0,
+                0.08,
+                0,
+                stretch,
+                true,
+                CycleMethod.NO_CYCLE,
+                new Stop(0.0, Color.rgb(30, 8, 16, 0.42 + brightness * 0.4)),
+                new Stop(0.55, Color.rgb(70, 14, 30, 0.34 + brightness * 0.35)),
+                new Stop(1.0, Color.rgb(110, 18, 28, 0.30 + brightness * 0.30)));
+
+        gc.save();
+        gc.translate(tremorOffsetX, 0);
+        gc.setFill(baseGradient);
+        gc.fillRect(-2, 0, frameSize + 4, frameSize);
+
+        // Gentle center vignette to keep focus and avoid visual noise.
+        LinearGradient centerDepth = new LinearGradient(
                 0,
                 0,
                 1,
+                0,
                 true,
                 CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.rgb(76, 18, 20, 0.45)),
-                new Stop(0.4, Color.rgb(120, 30, 34, 0.30 + open * 0.15)),
-                new Stop(1.0, Color.rgb(32, 8, 12, 0.55)));
-        gc.setFill(baseTint);
-        gc.fillRect(0, 0, frameSize, frameSize);
+                new Stop(0.0, Color.rgb(24, 6, 12, 0.12)),
+                new Stop(0.5, Color.rgb(120, 24, 40, 0.04 + open * 0.06)),
+                new Stop(1.0, Color.rgb(24, 6, 12, 0.12)));
+        gc.setFill(centerDepth);
+        gc.fillRect(-2, 0, frameSize + 4, frameSize);
 
-        double cavityHeight = frameSize * (0.24 + 0.42 * open);
-        double cavityY = frameSize * 0.5 - cavityHeight * 0.5 + tremorOffsetY;
-
-        RadialGradient innerMouth = new RadialGradient(
+        // Subtle gloss overlay controlled by saliva parameter.
+        double glossOpacity = 0.03 + salivaAmount * 0.12;
+        LinearGradient gloss = new LinearGradient(
                 0,
                 0,
-                frameSize * 0.5 + tremorOffsetX,
-                frameSize * 0.5 + tremorOffsetY,
-                frameSize * 0.46,
-                false,
+                0,
+                0.45,
+                true,
                 CycleMethod.NO_CYCLE,
-                new Stop(0.0, Color.rgb(24, 6, 9, 0.88)),
-                new Stop(0.65, Color.rgb(94, 22, 26, 0.55)),
-                new Stop(1.0, Color.rgb(160, 58, 68, 0.25)));
-        gc.setFill(innerMouth);
-        gc.fillOval(frameSize * 0.12 + tremorOffsetX, cavityY, frameSize * 0.76, cavityHeight);
-
-        gc.setStroke(Color.rgb(245, 220, 220, 0.18 + 0.22 * salivaAmount));
-        gc.setLineWidth(frameSize * 0.008);
-        gc.strokeArc(
-                frameSize * 0.18 + tremorOffsetX,
-                frameSize * (0.22 + 0.06 * (1.0 - open)) + tremorOffsetY,
-                frameSize * 0.64,
-                frameSize * 0.18,
-                180,
-                180,
-                javafx.scene.shape.ArcType.OPEN);
-
-        gc.setStroke(Color.rgb(220, 240, 255, 0.08 + 0.18 * salivaAmount));
-        gc.setLineWidth(frameSize * 0.004);
-        double salivaPhase = Math.sin(now * 2.7) * 0.5 + 0.5;
-        gc.strokeLine(
-                frameSize * 0.28 + tremorOffsetX,
-                frameSize * (0.34 + salivaPhase * 0.03),
-                frameSize * 0.72 + tremorOffsetX,
-                frameSize * (0.36 + salivaPhase * 0.02));
+                new Stop(0.0, Color.rgb(255, 220, 220, glossOpacity)),
+                new Stop(1.0, Color.rgb(255, 220, 220, 0.0)));
+        gc.setFill(gloss);
+        gc.fillRect(frameSize * 0.08, frameSize * 0.06, frameSize * 0.84, frameSize * 0.30);
+        gc.restore();
     }
 
     private static double clamp01(double value) {

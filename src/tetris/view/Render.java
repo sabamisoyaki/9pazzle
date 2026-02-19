@@ -45,9 +45,9 @@ public class Render {
     }
 
     private void drawDentalCornerAccents(GraphicsContext gc, double width, double height) {
-        gc.setStroke(Color.rgb(220, 230, 240, 0.55));
-        gc.setLineWidth(3.0);
-        double s = Math.min(width, height) * 0.06;
+        gc.setStroke(Color.rgb(198, 206, 220, 0.58));
+        gc.setLineWidth(2.0);
+        double s = Math.min(width, height) * 0.045;
 
         // Top-left
         gc.strokeLine(8, 8, 8 + s, 8);
@@ -64,12 +64,12 @@ public class Render {
     }
 
     private void drawTopFrameReflection(GraphicsContext gc, double width) {
-        gc.setStroke(Color.rgb(255, 255, 255, 0.18));
-        gc.setLineWidth(2.0);
-        gc.strokeLine(width * 0.1, 12, width * 0.9, 12);
-        gc.setStroke(Color.rgb(255, 255, 255, 0.10));
+        gc.setStroke(Color.rgb(255, 255, 255, 0.14));
+        gc.setLineWidth(1.5);
+        gc.strokeLine(width * 0.12, 10, width * 0.88, 10);
+        gc.setStroke(Color.rgb(210, 226, 255, 0.10));
         gc.setLineWidth(1.0);
-        gc.strokeLine(width * 0.16, 16, width * 0.84, 16);
+        gc.strokeLine(width * 0.20, 14, width * 0.80, 14);
     }
 
     public void drawNext(GraphicsContext gc, Tetromino next, int offsetX, int offsetY) {

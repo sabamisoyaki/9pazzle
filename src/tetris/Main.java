@@ -200,10 +200,10 @@ public class Main extends Application {
                         controller.getCurrent(),
                         controller.getGhost());
 
-                double opennessTarget = Math.min(1.0, 0.28 + (controller.getLineCount() * 0.03));
-                view.getPlayFieldPane().animateMouthOpen(opennessTarget, Duration.millis(180));
-                view.getPlayFieldPane().setSaliva(Math.min(1.0, 0.18 + (controller.getScore() / 2500.0)));
-                view.getPlayFieldPane().setTremor(Math.min(1.0, controller.getWorldRotateCount() * 0.08));
+                double opennessTarget = Math.min(1.0, 0.25 + (controller.getLineCount() * 0.02));
+                double salivaTarget = Math.min(1.0, 0.10 + (controller.getScore() / 3000.0));
+                double tremorTarget = Math.min(1.0, controller.getWorldRotateCount() * 0.08);
+                view.getPlayFieldPane().updateMouthEffects(opennessTarget, salivaTarget, tremorTarget);
 
                 int score = controller.getScore();
                 int lines = controller.getLineCount();
@@ -226,7 +226,7 @@ public class Main extends Application {
             }
         };
 
-        view.getPlayFieldPane().playMouthBreathLoop(0.22, 0.38, Duration.seconds(3.2));
+        view.getPlayFieldPane().playMouthBreathLoop(0.24, 0.34, Duration.seconds(3.6));
         timer.start();
         return scene;
     }
