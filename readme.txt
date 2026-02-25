@@ -18,3 +18,8 @@ BGM (optional)
 - Place an MP3 file at: audio\bgm.mp3
 - The game will loop this file during gameplay.
 - If the file is missing, the game runs silently.
+
+EXE packaging (Windows)
+- EXE化用データは `packaging/windows/jpackage` に追加済みです。
+- 詳細手順は `packaging/windows/jpackage/README_ja.md` を参照してください。
+- 主要スクリプト: `packaging/windows/jpackage/build-exe.bat`
