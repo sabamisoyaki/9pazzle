@@ -1,0 +1,4 @@
+9pazzle distribution package
+
+This installer is generated for local distribution/testing.
+Include third-party licenses (JavaFX/OpenJFX and others) as required by your release policy.
